@@ -1,4 +1,4 @@
-// import React from 'react';
+// import React from 'react'
 // import ReactDOM from 'react-dom'
 
 import React from './packages/react/index'
@@ -35,12 +35,42 @@ import './index.css'
 // )
 
 // 4. 支持渲染类组件，并实现 state 传入
+// class Welcome extends React.Component {
+//   render () {
+//     return React.createElement('h1', {
+//       className: 'frist',
+//       style: { color: 'blue' }
+//     }, 'Hello, ', React.createElement('span', null, this.props.name))
+//   }
+// }
+// console.log(<Welcome />)
+// ReactDOM.render(
+//   <Welcome name="陛下" />,
+//   document.getElementById('root')
+// )
+
+// 5. 支持类组件设置状态并且使用 setState() 改变状态
 class Welcome extends React.Component {
+  constructor (props) {
+    super(props)
+    // 类组件的状态必须声明在构造函数中
+    this.state = {
+      date: new Date()
+    }
+  }
+  componentDidMount () {
+    this.timer = setInterval(() => {
+      // 改变状态会使视图更新
+      this.setState({
+        date: new Date()
+      })
+    }, 1000)
+  }
   render () {
     return React.createElement('h1', {
       className: 'frist',
       style: { color: 'blue' }
-    }, 'Hello, ', React.createElement('span', null, this.props.name))
+    }, 'Hello, time is', React.createElement('span', null, this.state.date.toLocaleTimeString()))
   }
 }
 console.log(<Welcome />)

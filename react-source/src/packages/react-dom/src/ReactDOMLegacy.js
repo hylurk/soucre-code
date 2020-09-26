@@ -44,9 +44,8 @@ export function render (element, container, callback) {
     return container.appendChild(document.createTextNode(element))
   }
   // 否则，根据 type 生成对应的 element 标签
-  // - 如果 type 为函数，则说明是个函数组件
+  // - 如果 type 为函数，则说明是个函数组件或者类组件
   // - 函数组件执行后，会返回一个 React 元素
-  console.log(element)
   const { type, props } = element
   if (typeof type === 'function') { // 说明是类组件或者函数组件
     const componentInstance = new type(props)
