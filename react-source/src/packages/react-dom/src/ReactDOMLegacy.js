@@ -44,6 +44,19 @@ export function render (element, container, callback) {
     return container.appendChild(document.createTextNode(element))
   }
   // 否则，根据 type 生成对应的 element 标签
+  // - 如果 type 为函数，则说明是个函数组件
+  // - 函数组件执行后，会返回一个 React 元素
+  console.log(element)
+  const { type, props } = element
+  if (typeof type === 'function') { // 说明是类组件或者函数组件
+    const componentInstance = new type(props)
+    if (componentInstance.isReactComponent) { // 说明是类组件
+      element = componentInstance.render()
+    } else { // 是函数组件
+      element = type(props)
+    }
+  }
+
   let dom = createDOM(element)
   container.appendChild(dom)
   // 下面的太复杂啦，牵扯出一堆 fiber 的玩意，先直接用最简单的实现了。

@@ -3,12 +3,15 @@
  */
 import {
   createElement,
+  Component,
 } from './src/React'
 
 export {
   createElement,
+  Component,
 }
 
 export default {
   createElement,
+  Component,
 }
