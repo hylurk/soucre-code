@@ -17,11 +17,8 @@ function Component (props, context, updater) {
 // 是否是 react 类组件，为了区分是类组件还是函数组件
 // 源码是个对象，我们简版改成 boolean
 Component.prototype.isReactComponent = true
-console.log('dddd')
-console.log(Component.isReactComponent)
-// let a = new Component()
-// console.log(a.isReactComponent)
 
+// 我们也可以使用一下 class 的方式来实现
 // class Component {
 //   constructor (props, context, updater) {
 //     this.props = props
