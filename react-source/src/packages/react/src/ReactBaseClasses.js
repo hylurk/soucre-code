@@ -31,6 +31,18 @@ Component.prototype.isReactComponent = true
 //   static isReactComponent = true
 // }
 
+/**
+ * 定义 setState 方法
+ * @param {*} partialState 
+ * @param {*} callback 
+ */
+Component.prototype.setState = function(partialState, callback) {
+  // 判断传进来的 state 必须是 function 或者 object 或者 null
+  if (typeof partialState !== 'function' && typeof partialState !== 'object' && partialState !== null) {
+    throw new Error('setState(...): takes an object of state variables to update or a function which returns an object of state variables.')
+  }
+}
+
 export {
   Component,
 }
