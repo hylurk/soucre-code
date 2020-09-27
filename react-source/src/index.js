@@ -55,7 +55,8 @@ class Welcome extends React.Component {
     super(props)
     // 类组件的状态必须声明在构造函数中
     this.state = {
-      date: new Date()
+      date: new Date(),
+      count: 0
     }
   }
   componentDidMount () {
@@ -66,15 +67,38 @@ class Welcome extends React.Component {
       })
     }, 1000)
   }
+  handleClick = () => {
+    // setState 具有合并属性，以及异步的效果
+    this.setState({
+      count: this.state.count + 1
+    }, () => {
+      console.log(this.state.count)
+    }) 
+    console.log(this.state.count)
+    this.setState({
+      count: this.state.count + 1
+    }, () => {
+      console.log(this.state.count)
+    })
+    console.log(this.state.count)
+  }
   render () {
-    return React.createElement('h1', {
-      className: 'frist',
-      style: { color: 'blue' }
-    }, 'Hello, time is', React.createElement('span', null, this.state.date.toLocaleTimeString()))
+    return (
+      <div className="title">
+        <h2>你好，{this.props.name}</h2>
+        <h3>我是标题</h3>
+        <h4>当前时间：{this.state.date.toLocaleTimeString()}</h4>
+        <p>你已经点了我 <span>{this.state.count}</span> 次</p>
+        <button onClick={this.handleClick}>点我将加 1</button>
+      </div>
+    )
   }
 }
-console.log(<Welcome />)
+
 ReactDOM.render(
   <Welcome name="陛下" />,
-  document.getElementById('root')
+  document.getElementById('root'),
+  () => {
+    console.log(22)
+  }
 )

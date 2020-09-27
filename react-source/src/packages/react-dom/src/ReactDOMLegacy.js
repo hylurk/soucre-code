@@ -28,6 +28,35 @@ import { isValidContainer } from './ReactDOMRoot'
 // }
 
 /**
+ * 自我实现，渲染 children 节点与根节点分开
+ * @param {*} parentComponent 
+ * @param {*} children 
+ * @param {*} container 
+ */
+function legacyRenderSubtreeIntoContainer(parentComponent, child, container) {
+  // ===== 以下为简版实现 =====
+  // 如果传过来的是字符串或者数字，直接当做文本节点插入
+  if (typeof child === 'string' || typeof child === 'number') {
+    return container.appendChild(document.createTextNode(child))
+  }
+  // 否则，根据 type 生成对应的 element 标签
+  // - 如果 type 为函数，则说明是个函数组件或者类组件
+  // - 函数组件执行后，会返回一个 React 元素
+  child.rootComponent = parentComponent
+  const { type, props } = child
+  if (typeof type === 'function') { // 说明是类组件或者函数组件
+    const componentInstance = new type(props)
+    if (componentInstance.isReactComponent) { // 说明是类组件
+      child = componentInstance.render()
+      child.rootComponent = componentInstance
+    } else { // 是函数组件
+      child = type(props)
+    }
+  }
+  let dom = createDOM(child)
+  container.appendChild(dom)
+}
+/**
  * ReactDOM 核心渲染 DOM 的方法
  * @param { react element } element 要渲染的 react 元素
  * @param { node } container 被渲染元素的容器
@@ -51,12 +80,16 @@ export function render (element, container, callback) {
     const componentInstance = new type(props)
     if (componentInstance.isReactComponent) { // 说明是类组件
       element = componentInstance.render()
+      element.rootComponent = componentInstance
     } else { // 是函数组件
       element = type(props)
     }
   }
-
   let dom = createDOM(element)
+  // 如果是类组件，让组件的实例的 dom 属性指向这个类组件创建出来的真实 DOM
+  if (element.rootComponent) {
+    element.rootComponent.dom = dom
+  }
   container.appendChild(dom)
   // 下面的太复杂啦，牵扯出一堆 fiber 的玩意，先直接用最简单的实现了。
   // return legacyRenderSubtreeIntoContainer(
@@ -68,8 +101,49 @@ export function render (element, container, callback) {
   // )
 }
 
+/**
+ * 合成事件，在事件处理函数执行前，要将批量更新模式设置为 true，缓存新状态，实现异步更新
+ * 将所有的事件委托到 document 上
+ * @param {*} target 要绑定事件的 DOM
+ * @param {*} eventType 事件类型
+ * @param {*} listener 事件处理函数
+ * @param {*} componentInstance 组件实例
+ */
+function addEvent(target, eventType, listener, componentInstance) {
+  let eventStore = target.eventStore || (target.eventStore = {})
+  eventStore[eventType] = {
+    listener,
+    componentInstance
+  }
+}
+document.addEventListener('click', dispatchEvent, false)
+function dispatchEvent(event) {
+  let {type, target} = event
+  while (target) {
+    const { eventStore } = target
+    if (eventStore) {
+      const { listener, componentInstance } = eventStore['on' + type]
+      if (listener) {
+        if (componentInstance) {
+          componentInstance.isBatchingUpdate = true
+        }
+        listener.call(null, event)
+        if (componentInstance) {
+          componentInstance.isBatchingUpdate = false
+          componentInstance.forceUpdate()
+        }
+      }
+    }
+    target = target.parentNode
+  }
+}
+
+/**
+ * 创建真实 DOM 元素
+ * @param {react 元素} element 
+ */
 export function createDOM (element) {
-  const { type, props } = element
+  const { type, props, rootComponent } = element
   const { children } = props
   let dom = document.createElement(type)
   for (let propName in props) {
@@ -78,7 +152,9 @@ export function createDOM (element) {
       // 如果 children 是数组，则递归渲染每一项
       // 否则直接将 children 渲染到 DOM 上
       if (Array.isArray(children)) {
-        children.forEach(item => render(item, dom))
+        // 此时重复调用 render 会引起后续的副作用，比如导致记录不了一些组件状态 isBatchingUpdate 等
+        // 单独提出来另一个方法来实现
+        children.forEach(item => legacyRenderSubtreeIntoContainer(rootComponent, item, dom))
       } else {
         render(children, dom)
       }
@@ -89,10 +165,23 @@ export function createDOM (element) {
       for (let style in styles) {
         dom.style[style] = styles[style]
       }
+    } else if (propName.startsWith('on')) { // 绑定事件
+      addEvent(dom, propName.toLowerCase(), props[propName], element.rootComponent)
     } else {
       // TODO 需判断 class，style，htmlFor 等
       dom.setAttribute(propName, props[propName])
     }
   }
   return dom
+}
+
+/**
+ * 只是简版实现，跟源码不同
+ * @param {*} componentInstance 组件实例
+ */
+export function updateComponent(componentInstance) {
+  // 把旧 DOM 节点替换成新的 DOM 节点
+  const latestDOM = createDOM(componentInstance.render())
+  componentInstance.dom.parentNode.replaceChild(latestDOM, componentInstance.dom)
+  componentInstance.dom = latestDOM
 }
