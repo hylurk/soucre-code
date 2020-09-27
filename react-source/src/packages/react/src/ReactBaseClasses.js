@@ -47,8 +47,9 @@ Component.prototype.setState = function(partialState, callback = () => {}) {
   if (typeof partialState !== 'function' && typeof partialState !== 'object' && partialState !== null) {
     throw new Error('setState(...): takes an object of state variables to update or a function which returns an object of state variables.')
   }
-  // TODO
-  // 这块源码没看懂，先用发布订阅方式简单实现了
+  // 这块源码实现比较复杂，初始渲染的时候就传进去了一个 updater
+  // 路径：packages/react-dom/src/server/ReactPartialRenderer.js
+  // 此处先用发布订阅方式简单实现了
   this.updateQueue.push(partialState)
   if (!this.isBatchingUpdate) { // 如果不是处于批量更新模式，则直接更新
     this.forceUpdate()
@@ -60,12 +61,12 @@ Component.prototype.setState = function(partialState, callback = () => {}) {
  * @param {*} callback 更新完毕之后执行回调
  */
 Component.prototype.forceUpdate = function(callback = () => {}) {
-  const latestState = this.updateQueue.reduce((accumulator, currentValue) => {
+  this.state = this.updateQueue.reduce((accumulator, currentValue) => {
     const nextState = typeof currentValue === 'function' ? currentValue(this.state) : currentValue
     return {...accumulator, ...nextState}
   }, this.state)
-  this.state = latestState
   this.updateQueue = []
+  debugger
   updateComponent(this)
   callback()
 }
