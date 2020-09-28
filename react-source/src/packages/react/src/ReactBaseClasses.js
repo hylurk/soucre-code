@@ -66,7 +66,6 @@ Component.prototype.forceUpdate = function(callback = () => {}) {
     return {...accumulator, ...nextState}
   }, this.state)
   this.updateQueue = []
-  debugger
   updateComponent(this)
   callback()
 }

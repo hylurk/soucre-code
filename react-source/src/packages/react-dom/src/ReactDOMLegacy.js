@@ -181,9 +181,9 @@ export function createDOM (element) {
  */
 export function updateComponent(componentInstance) {
   // 把旧 DOM 节点替换成新的 DOM 节点
-  console.log('进入更新')
-  console.log(componentInstance)
-  const latestDOM = createDOM(componentInstance.render())
+  const element = componentInstance.render()
+  element.rootComponent = componentInstance
+  const latestDOM = createDOM(element)
   componentInstance.dom.parentNode.replaceChild(latestDOM, componentInstance.dom)
   componentInstance.dom = latestDOM
 }
