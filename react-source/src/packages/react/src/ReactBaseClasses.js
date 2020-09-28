@@ -18,6 +18,7 @@ function Component (props, context, updater) {
   // 发布订阅方式实现 setState 方法
   this.updateQueue = [] // 缓存临时的更新队列
   this.isBatchingUpdate = false // 当前是否处于批量更新：true 是，false 不是
+  this.callbacks = [] // 缓存 callback 事件
 }
 // 一些静态属性绑在了 Component 的原型上，避免每个实例都要生成一份
 // 是否是 react 类组件，为了区分是类组件还是函数组件
@@ -42,7 +43,7 @@ Component.prototype.isReactComponent = true
  * @param {*} partialState 
  * @param {*} callback 
  */
-Component.prototype.setState = function(partialState, callback = () => {}) {
+Component.prototype.setState = function(partialState, callback) {
   // 判断传进来的 state 必须是 function 或者 object 或者 null
   if (typeof partialState !== 'function' && typeof partialState !== 'object' && partialState !== null) {
     throw new Error('setState(...): takes an object of state variables to update or a function which returns an object of state variables.')
@@ -51,6 +52,9 @@ Component.prototype.setState = function(partialState, callback = () => {}) {
   // 路径：packages/react-dom/src/server/ReactPartialRenderer.js
   // 此处先用发布订阅方式简单实现了
   this.updateQueue.push(partialState)
+  if (typeof callback === 'function') {
+    this.callbacks.push(callback)
+  }
   if (!this.isBatchingUpdate) { // 如果不是处于批量更新模式，则直接更新
     this.forceUpdate()
   }
@@ -60,14 +64,18 @@ Component.prototype.setState = function(partialState, callback = () => {}) {
  * 强制更新 DOM
  * @param {*} callback 更新完毕之后执行回调
  */
-Component.prototype.forceUpdate = function(callback = () => {}) {
+Component.prototype.forceUpdate = function(callback) {
+  if (typeof callback === 'function') {
+    this.callbacks.push(callback)
+  }
   this.state = this.updateQueue.reduce((accumulator, currentValue) => {
     const nextState = typeof currentValue === 'function' ? currentValue(this.state) : currentValue
     return {...accumulator, ...nextState}
   }, this.state)
   this.updateQueue = []
   updateComponent(this)
-  callback()
+  this.callbacks.forEach(cb => cb())
+  this.callbacks = []
 }
 
 export {

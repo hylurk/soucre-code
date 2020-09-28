@@ -91,6 +91,9 @@ export function render (element, container, callback) {
     element.rootComponent.dom = dom
   }
   container.appendChild(dom)
+  if (typeof callback === 'function') {
+    callback()
+  }
   // 下面的太复杂啦，牵扯出一堆 fiber 的玩意，先直接用最简单的实现了。
   // return legacyRenderSubtreeIntoContainer(
   //   null,
