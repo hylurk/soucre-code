@@ -76,9 +76,12 @@ export function render (element, container, callback) {
   // - 如果 type 为函数，则说明是个函数组件或者类组件
   // - 函数组件执行后，会返回一个 React 元素
   const { type, props } = element
+  let componentInstance = null
   if (typeof type === 'function') { // 说明是类组件或者函数组件
-    const componentInstance = new type(props)
+    componentInstance = new type(props)
     if (componentInstance.isReactComponent) { // 说明是类组件
+      // 类组件生命周期函数 - componentWillMount
+      componentInstance.componentWillMount && componentInstance.componentWillMount()
       element = componentInstance.render()
       element.rootComponent = componentInstance
     } else { // 是函数组件
@@ -91,6 +94,8 @@ export function render (element, container, callback) {
     element.rootComponent.dom = dom
   }
   container.appendChild(dom)
+  // 类组件生命周期函数 - componentDidMount
+  componentInstance?.componentDidMount && componentInstance.componentDidMount()
   if (typeof callback === 'function') {
     callback()
   }

@@ -50,6 +50,13 @@ import './index.css'
 // )
 
 // 5. 支持类组件设置状态并且使用 setState() 改变状态
+class SubWelcome extends React.Component {
+  render () {
+    return (
+    <span>{this.props.count}</span>
+    )
+  }
+}
 class Welcome extends React.Component {
   constructor (props) {
     super(props)
@@ -90,6 +97,7 @@ class Welcome extends React.Component {
         <h4>当前时间：{this.state.date.toLocaleTimeString()}</h4>
         <p>你已经点了我 <span>{this.state.count}</span> 次</p>
         <button onClick={this.handleClick}>点我将加 1</button>
+        <p>子组件收到了点击 <SubWelcome count={this.state.count}/> 次</p>
       </div>
     )
   }

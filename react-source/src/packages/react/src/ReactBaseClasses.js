@@ -69,7 +69,7 @@ Component.prototype.forceUpdate = function(callback) {
     this.callbacks.push(callback)
   }
   this.state = this.updateQueue.reduce((accumulator, currentValue) => {
-    const nextState = typeof currentValue === 'function' ? currentValue(this.state) : currentValue
+    const nextState = typeof currentValue === 'function' ? currentValue(accumulator) : currentValue
     return {...accumulator, ...nextState}
   }, this.state)
   this.updateQueue = []
