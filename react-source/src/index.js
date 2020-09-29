@@ -112,30 +112,60 @@ import './index.css'
 // )
 
 // 6. 支持 ref 属性，ref 可以是字符串、函数、对象
-class Calculator extends React.Component {
+// class Calculator extends React.Component {
+//   constructor (props) {
+//     super(props)
+//     this.num2 = React.createRef()
+//   }
+//   handleAdd = () => {
+//     const num1 = this.num1.value
+//     const num2 = this.num2.current.value
+//     this.refs.count.value = parseFloat(num1) + parseFloat(num2)
+//   }
+//   render() {
+//     return (
+//       <div style={{ padding: '50px 10px' }}>
+//         <input ref={ins => this.num1 = ins} />
+//         +
+//         <input ref={ this.num2 } />
+//         <button style={{width: '50px'}} onClick={this.handleAdd}> = </button>
+//         <input ref="count" />
+//       </div>
+//     )
+//   }
+// }
+class TextInput extends React.Component {
+  constructor (props) {
+    super (props)
+    this.textInput = React.createRef()
+  }
+  getFocus = () => {
+    this.textInput.current.focus()
+    this.textInput.current.value = '3333'
+  }
+  render () {
+    return <input ref={this.textInput} />
+  }
+}
+class Form extends React.Component {
   constructor (props) {
     super(props)
-    this.num2 = React.createRef()
+    this.textInput = React.createRef()
   }
-  handleAdd = () => {
-    const num1 = this.num1.value
-    const num2 = this.num2.current.value
-    this.refs.count.value = parseFloat(num1) + parseFloat(num2)
+  getFocus = () => {
+    this.textInput.current.getFocus()
   }
-  render() {
+  render () {
     return (
-      <div style={{ padding: '50px 10px' }}>
-        <input ref={ins => this.num1 = ins} />
-        +
-        <input ref={ this.num2 } />
-        <button style={{width: '50px'}} onClick={this.handleAdd}> = </button>
-        <input ref="count" />
+      <div>
+        <h3>标题</h3>
+        <TextInput ref={this.textInput} />
+        <button onClick={this.getFocus}>点击我获得焦点</button>
       </div>
     )
   }
 }
-
 ReactDOM.render(
-  <Calculator />,
+  <Form />,
   document.getElementById('root')
 )

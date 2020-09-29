@@ -63,6 +63,8 @@ function legacyRenderSubtreeIntoContainer(parentComponent, child, container) {
  * @param { Function } callback 渲染执行完毕之后的回调函数
  */
 export function render (element, container, callback) {
+  console.log(element)
+  console.log(container)
   // 如果不是有效的 DOM 容器，则抛出异常
   if (!isValidContainer(container)) {
     throw new Error('Target container is not a DOM element.')
@@ -79,7 +81,11 @@ export function render (element, container, callback) {
   let componentInstance = null
   if (typeof type === 'function') { // 说明是类组件或者函数组件
     componentInstance = new type(props)
+    // console.log(componentInstance)
     if (componentInstance.isReactComponent) { // 说明是类组件
+      if (element.ref) {
+        element.ref.current = componentInstance
+      }
       // 类组件生命周期函数 - componentWillMount
       componentInstance.componentWillMount && componentInstance.componentWillMount()
       element = componentInstance.render()
@@ -153,7 +159,6 @@ function dispatchEvent(event) {
 export function createDOM (element) {
   const { type, props, rootComponent } = element
   let { ref } = element
-  console.log(element)
   const { children } = props
   let dom = document.createElement(type)
   for (let propName in props) {
