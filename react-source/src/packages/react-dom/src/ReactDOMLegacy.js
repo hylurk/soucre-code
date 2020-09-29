@@ -152,6 +152,8 @@ function dispatchEvent(event) {
  */
 export function createDOM (element) {
   const { type, props, rootComponent } = element
+  let { ref } = element
+  console.log(element)
   const { children } = props
   let dom = document.createElement(type)
   for (let propName in props) {
@@ -178,6 +180,15 @@ export function createDOM (element) {
     } else {
       // TODO 需判断 class，style，htmlFor 等
       dom.setAttribute(propName, props[propName])
+    }
+  }
+  if (ref) {
+    if (typeof ref === 'string') { // ref 是一个字符串，不推荐
+      element.rootComponent.refs[ref] = dom
+    } else if (typeof ref === 'function') { // ref 是一个函数，不推荐
+      ref.call(element.rootComponent, dom)
+    } else if (typeof ref === 'object') { // ref 是一个对象，推荐，支持函数组件，上面两种只支持类组件
+      ref.current = dom
     }
   }
   return dom

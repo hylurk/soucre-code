@@ -4,14 +4,17 @@
 import {
   createElement,
   Component,
+  createRef,
 } from './src/React'
 
 export {
   createElement,
   Component,
+  createRef,
 }
 
 export default {
   createElement,
   Component,
+  createRef,
 }

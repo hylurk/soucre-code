@@ -65,6 +65,7 @@ Component.prototype.setState = function(partialState, callback) {
  * @param {*} callback 更新完毕之后执行回调
  */
 Component.prototype.forceUpdate = function(callback) {
+  if (!this.updateQueue.length) return
   if (typeof callback === 'function') {
     this.callbacks.push(callback)
   }

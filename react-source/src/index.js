@@ -113,17 +113,21 @@ import './index.css'
 
 // 6. 支持 ref 属性，ref 可以是字符串、函数、对象
 class Calculator extends React.Component {
+  constructor (props) {
+    super(props)
+    this.num2 = React.createRef()
+  }
   handleAdd = () => {
-    const num1 = this.refs.num1.value
-    const num2 = this.refs.num2.value
+    const num1 = this.num1.value
+    const num2 = this.num2.current.value
     this.refs.count.value = parseFloat(num1) + parseFloat(num2)
   }
   render() {
     return (
       <div style={{ padding: '50px 10px' }}>
-        <input ref="num1" />
+        <input ref={ins => this.num1 = ins} />
         +
-        <input ref="num2" />
+        <input ref={ this.num2 } />
         <button style={{width: '50px'}} onClick={this.handleAdd}> = </button>
         <input ref="count" />
       </div>
