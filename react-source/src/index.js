@@ -1,8 +1,8 @@
 // import React from 'react'
-// import ReactDOM from 'react-dom'
+import ReactDOM from 'react-dom'
 
 import React from './packages/react/index'
-import ReactDOM from './packages/react-dom/index'
+// import ReactDOM from './packages/react-dom/index'
 
 import './index.css'
 

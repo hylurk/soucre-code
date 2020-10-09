@@ -47,6 +47,9 @@ function legacyRenderSubtreeIntoContainer(parentComponent, child, container) {
   if (typeof type === 'function') { // 说明是类组件或者函数组件
     const componentInstance = new type(props)
     if (componentInstance.isReactComponent) { // 说明是类组件
+      if (props.ref) {
+        props.ref.current = componentInstance
+      }
       child = componentInstance.render()
       child.rootComponent = componentInstance
     } else { // 是函数组件
@@ -63,8 +66,6 @@ function legacyRenderSubtreeIntoContainer(parentComponent, child, container) {
  * @param { Function } callback 渲染执行完毕之后的回调函数
  */
 export function render (element, container, callback) {
-  console.log(element)
-  console.log(container)
   // 如果不是有效的 DOM 容器，则抛出异常
   if (!isValidContainer(container)) {
     throw new Error('Target container is not a DOM element.')
@@ -81,7 +82,6 @@ export function render (element, container, callback) {
   let componentInstance = null
   if (typeof type === 'function') { // 说明是类组件或者函数组件
     componentInstance = new type(props)
-    // console.log(componentInstance)
     if (componentInstance.isReactComponent) { // 说明是类组件
       if (element.ref) {
         element.ref.current = componentInstance
