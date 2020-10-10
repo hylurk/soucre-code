@@ -169,3 +169,35 @@ ReactDOM.render(
   <Form />,
   document.getElementById('root')
 )
+
+
+
+// function green() {
+//   console.log("green");
+// }
+// function yellow() {
+//   console.log("yellow");
+// }
+// function red() {
+//   console.log("red")
+// }
+// const delay = (duration, cb = () => {}) => {
+//   return new Promise(() => {
+//     setTimeout(() => {
+//       cb()
+//     }, duration)
+//   })
+// }
+// const myFor = () => {
+//   delay(3000, () => {
+//     red()
+//     delay(1000, () => {
+//       green()
+//       delay(2000, () => {
+//         yellow()
+//         myFor()
+//       })
+//     })
+//   })
+// }
+// myFor()
